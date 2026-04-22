@@ -1,3 +1,5 @@
+** In order for this to work pandas needs to be installed
+
 Files in repository:
 
 bash_answers.txt (Q1)
