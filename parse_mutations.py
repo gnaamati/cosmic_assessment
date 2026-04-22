@@ -72,7 +72,6 @@ def print_high_low(sample_mutation_count):
     highest    = 0 
     lowest_id  =  highest_id =  ''
    
-    ##Go over all the 
     for sample in sample_mutation_count:
         ##count how many unique mutations per sample_id
         count = len(sample_mutation_count[sample])
