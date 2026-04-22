@@ -13,8 +13,15 @@ def read_file(file):
     try:
         df = pd.read_csv(file, sep="\t")
     except FileNotFoundError:
-        print(f"ERROR: File not found: {args.file}", file=sys.stderr)
+        print(f"ERROR: File not found: {file}", file=sys.stderr)
         raise SystemExit(1)
+    except Exception as e:
+        print(f"ERROR: Failed to read {file}: {e}", file=sys.stderr)
+        raise SystemExit(1)
+    
+    if df.empty:
+        print("No data rows found in file", file=sys.stderr)
+        raise SystemExit(0)
     
     return df
 
@@ -25,7 +32,6 @@ def check_columns(df):
     if missing:
         raise SystemExit(f"Missing required columns: {missing}")
     
-
 def get_data(mutation):
     valid_dna = {"A", "C", "G", "T"} ##Assuming DNA is uppercase
     
@@ -34,20 +40,24 @@ def get_data(mutation):
     mutation_id = mutation.get('icgc_mutation_id')
     sample_id   = mutation.get('icgc_sample_id')
 
+    # Check for missing or empty values
+    for val in (mut_from, mut_to, mutation_id, sample_id):
+        if pd.isna(val) or str(val).strip() == "":
+            print("Missing value in input")
+            return None
+    
     ##Check data looks OK 
     if mut_from not in valid_dna or mut_to not in valid_dna:
         print(f"Invalid DNA ({mut_from} -> {mut_to})")
-        return 
+        return None
     elif not mutation_id.startswith("MU") or not mutation_id[2:].isdigit():
         print(f"Icgc_mutation_id is not in the form of MU and a digit")
-        return 
-    elif not sample_id.startswith("SA") or not mutation_id[2:].isdigit():
+        return None
+    elif not sample_id.startswith("SA") or not sample_id[2:].isdigit():
         print(f"Icgc_sample_id is not in the form of SA and a digit")
-        return 
+        return None
     
     return (mut_from,mut_to,mutation_id,sample_id)
-
-
 
 def display_patterns(patterns):
     ##Go over dict and print all the patterns and their unique mutation count
@@ -65,7 +75,7 @@ def print_high_low(sample_mutation_count):
     ##Go over all the 
     for sample in sample_mutation_count:
         ##count how many unique mutations per sample_id
-        count = len(sample_mutation_count[sample].keys())
+        count = len(sample_mutation_count[sample])
         if count < lowest:
             lowest = count
             lowest_id = sample
@@ -89,20 +99,21 @@ def main():
     ##Read file using pandas
     df = read_file(args.file)
     
-    ##Use Panda to read file and check relevent columns exist
+    ##Check relevent columns exist
     check_columns(df)
 
-    ##Go over each line as a dict and collect relevant info 
+    ##Go over each line as a dict and count relevant info
     for i, mutation in enumerate(df.to_dict("records"), start=2):
         
         ##Get relevant data and check validity - skip if not valid       
-        try:
-            mut_from,mut_to,mutation_id,sample_id = get_data(mutation)
-        except:
+        mutation_data = get_data(mutation)
+        if mutation_data is None:
             print(f"skipping line {i}")
             continue 
-        
-        ##Only count once for each mutation_id 
+          
+        mut_from,mut_to,mutation_id,sample_id = mutation_data
+    
+        ##Count mutation patterns once for each mutation_id 
         if uniq_counter[mutation_id] == 0:
             patterns[mut_from][mut_to] +=1
             uniq_counter[mutation_id] = 1
