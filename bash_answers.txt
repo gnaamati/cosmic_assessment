@@ -29,10 +29,8 @@ except OperationalError:
     return
 
 Again, I can choose to continue running or stopping the script.
-Like befoe it makes sense in certain cases to print out errors to a log file (or files)
-When I programmed in Perl I also used perlcritic with different severity levels - 
-and then you can get more info about each error (or less) according to severity
-(You might not always want or need the full info while developing but couold be useful in the future)
+Like before it makes sense in certain cases to print out errors to a log file (or files)
+And also use tests (like pytest)
 
 C:
 In Perl I would use the eval and $@ command:
@@ -46,8 +44,13 @@ if ($@) {
 }
 ========================================= 
 
+When I programmed in Perl I also used perlcritic with different severity levels - 
+and then you can get more info about each error (or less) according to severity
+(You might not always want or need the full info while developing but couold be useful in the future)
+
+
 D:
-I haven't used psql but have used sqlplus in the past (although I don't have it on my PC).
+I haven't used psql but have used sqlplus in the past.
 From my experience there is a straightforward error command, e.g.
 ORA-00942: table or view does not exist
 My advice here is to look up the error (if not clear) or use a GUI that allows you a better view
