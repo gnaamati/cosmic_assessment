@@ -28,7 +28,11 @@ except OperationalError:
     print("Could not connect to the database. Exiting.")
     return
 
-Again, I can choose to continue running or stopping the script
+Again, I can choose to continue running or stopping the script.
+Like befoe it makes sense in certain cases to print out errors to a log file (or files)
+When I programmed in Perl I also used perlcritic with different severity levels - 
+and then you can get more info about each error (or less) according to severity
+(You might not always want or need the full info while developing but couold be useful in the future)
 
 C:
 In Perl I would use the eval and $@ command:
