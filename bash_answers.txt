@@ -1,0 +1,90 @@
+Question 1.1: How to properly track errors in:
+● Bash, when you call other Unix commands
+● Python script
+● Perl script
+● Database command line tool, sqlplus for Oracle or psql for PostgreSQL
+
+A: 
+Bash: I can use the $? variable - it should be 0 after a sucessful unix call.
+I can then decide if I want to just track the error or exit, for example:
+
+======================================== 
+ls xxxxxx
+if [ $? -ne 0 ]; then
+  echo "Error: unix command failed"
+  exit ##This is optional
+fi
+======================================== 
+
+Note: For a long run I can direct output to a log file which I can then check for errors
+
+B:
+In Python I can use the "try" command - it will catch errors:
+For example in a script I wrote that tries to connect to Ensembl DB:
+
+try:
+    conn = connect_to_ensembl()
+except OperationalError:
+    print("Could not connect to the database. Exiting.")
+    return
+
+Again, I can choose to continue running or stopping the script
+
+C:
+In Perl I would use the eval and $@ command:
+========================================= 
+eval {
+    my $x = 100 / 0
+};
+
+if ($@) {
+    print "Caught error: $@";
+}
+========================================= 
+
+D:
+I haven't used psql but have used sqlplus in the past (although I don't have it on my PC).
+From my experience there is a straightforward error command, e.g.
+ORA-00942: table or view does not exist
+My advice here is to look up the error (if not clear) or use a GUI that allows you a better view
+
+1.2
+If your Bash script contains asynchronized commands, such as IBM LSF or
+Slurm job schedulers, how to compose your script to make sure everything works well and
+exits with a proper code?
+
+A: In the past I did this via Bash or Perl. One way is to catch all the JOB IDs after submission 
+eg. JOB_ID=$(bsub -J myJobName...)
+
+We can then access all LSF job (bjob -w etc) and check if the jobs are all working.
+Then a loop that checks for the jobs are can run every few seconds.
+Once all the jobs are accounted for the script ends.
+
+We can also add a timer (e.g. 10 min) and if all the jobs are not accounted we can quit with an error.
+There are a few issues with this, for example if a job ends to quickly (we can add other tests if needed).
+
+The best way to do this is with a workflow pipeline (e.g. Nextflow) but for something short and quick monitoring the jobs IDs should work.
+
+1.3
+Why the code comment is important in Bash? And how to give proper
+comments in a Bash script?
+
+A: Comments are important to understand how the code works, especially in Bash were it can be less intuative (and often isn't broken into main/subroutines etc)
+I use # to add comments - for example in this simple code to list all the files with human date
+
+#!/bin/bash
+
+ls -l | while read -r line; do ##Go over all the file with additional info (-l)
+    
+    date=$(echo "$line" | awk '{print $10,$7,$8,$9}') ##Use awk to get relevant info for date
+
+    echo "$date" ##Print relevant lines
+
+    echo ##Extra echo for breaklines
+   
+done
+
+
+
+
+
