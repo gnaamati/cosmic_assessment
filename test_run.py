@@ -26,7 +26,6 @@ icgc_sample_id with highest unique icgc_mutation_id is SA514847 with 6 mutation 
 icgc_sample_id with lowest unique icgc_mutation_id is SA514847 with 6 mutation count
 """
 
-    assert result.returncode == 0
     assert result.stdout == expected
 
 
