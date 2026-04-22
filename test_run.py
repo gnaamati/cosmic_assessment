@@ -73,7 +73,7 @@ def test_missing_file():
     # should fail
     assert result.returncode != 0
 
-    # should show your error message
+    # should show error message
     assert "ERROR: File not found:" in result.stderr
 
 def test_missing_column():
@@ -86,7 +86,7 @@ def test_missing_column():
      # should fail
     assert result.returncode != 0
 
-    # should show your error message
+    # should show error message
     assert "Missing required columns: {'icgc_sample_id'}" in result.stderr
 
 def test_bad_dna():
@@ -107,6 +107,7 @@ def test_bad_sample():
         text=True
     )
 
+    #Doesn't fail but shows warning
     assert result.returncode == 0
     assert "Icgc_sample_id is not in the form of SA and a digit" in result.stdout
     assert "skipping line" in result.stdout
@@ -118,6 +119,7 @@ def test_missing_mutation_id():
         text=True
     )
 
+    #Doesn't fail but shows warning
     assert result.returncode == 0
     assert "Missing value in input" in result.stdout
     assert "skipping line" in result.stdout
